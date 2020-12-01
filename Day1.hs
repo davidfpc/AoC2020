@@ -1,9 +1,9 @@
-module Day1(day1) where
+module Day1(main) where
 
 import Data.List (tails)
 
-day1 :: IO ()
-day1 = do
+main :: IO ()
+main = do
   -- Read file
   expenses <- readInput "./inputFiles/day1.txt"
   print . part1 $ expenses
