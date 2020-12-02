@@ -1,6 +1,8 @@
 module Day2 (main) where
 
-import Data.List.Split (splitOn)
+import Data.List.Split (splitOneOf)
+
+type PasswordData = (Int, Int, Char, String)
 
 main :: IO ()
 main = do
@@ -10,7 +12,7 @@ main = do
   print $ part2 passwords
 
 -- Notice the IO [Int] -> this is needed because of the error handling?????
-readInput :: FilePath -> IO [(Int, Int, Char, String)]
+readInput :: FilePath -> IO [PasswordData]
 readInput file = do
   -- Read File (IO String, so when doing "<-" whe are executing the IO action, so contents will be a String and not an IO String)
   contents <- readFile file
@@ -18,29 +20,38 @@ readInput file = do
   let input = map parseLine $ lines contents
   return input
 
-part1 :: [(Int, Int, Char, String)] -> Int
-part1 passwords = length $ filter part1FilterFunc passwords
+-- filter the passwords based on the part1Filter, and count the results
+part1 :: [PasswordData] -> Int
+part1 passwords = length $ filter part1Filter passwords
 
-part2 :: [(Int, Int, Char, String)] -> Int
-part2 passwords = length $ filter part2FilterFunc passwords
+-- filter the passwords based on the part2Filter, and count the results
+part2 :: [PasswordData] -> Int
+part2 passwords = length $ filter part2Filter passwords
 
-part1FilterFunc :: (Int, Int, Char, String) -> Bool
-part1FilterFunc (minOccurs, maxOccurs, charPassword, passwordText) = do
-  let countChars = length $ filter (== charPassword) passwordText
-  (countChars >= minOccurs) && (countChars <= maxOccurs)
+-- filter the password, to only contain the charPassword chars and the validate if the number of occurrences is between the given values
+part1Filter :: PasswordData -> Bool
+part1Filter (minOccurs, maxOccurs, charPassword, pass) = n >= minOccurs && n <= maxOccurs
+  where
+    n = length $ filter (== charPassword) pass
 
-part2FilterFunc :: (Int, Int, Char, String) -> Bool
-part2FilterFunc (index1, index2, charPassword, passwordText) = do
-  let occur1 = index1 - 1
-      occur2 = index2 -1
-  (charPassword == (passwordText !! occur1) || charPassword == (passwordText !! occur2)) && ((passwordText !! occur1) /= (passwordText !! occur2))
+-- get the p1 and p2 positions of the password, and check if they are the same as charPassword. As only one of them can contain it, validate that the comparation results are diferent (xor)
+part2Filter :: PasswordData -> Bool
+part2Filter (p1, p2, charPassword, pass) = (c1 == charPassword) /= (c2 == charPassword)
+  where
+    c1 = pass !! (p1 -1)
+    c2 = pass !! (p2 -1)
 
-parseLine :: String -> (Int, Int, Char, String)
-parseLine input = do
-  let splited = splitOn ": " input
-  let password = last splited
-  let occurences = head $ splitOn " " $ head splited
-  let character = head $ last $ splitOn " " $ head splited
-  let minOccurs = read $ head $ splitOn "-" occurences
-  let maxOccurs = read $ last $ splitOn "-" occurences
-  (minOccurs, maxOccurs, character, password)
+-- parse the input, converting to PasswordData
+parseInput :: [String] -> PasswordData
+parseInput input = (n1, n2, c, pass)
+  where
+    n1 = read $ head input
+    n2 = read $ input !! 1
+    c = head $ input !! 2
+    pass = input !! 4
+
+-- parse the line and convert it to PasswordData
+parseLine :: String -> PasswordData
+parseLine input = parseInput splited
+  where
+    splited = splitOneOf "- :" input
