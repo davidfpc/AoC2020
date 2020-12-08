@@ -21,7 +21,7 @@ part1 input =
       answersPerGroup = fst answers ++ [snd answers]
    in sum $ map length answersPerGroup
 
--- part 1, how many answers to the customs forms
+-- part 2, how many answers to the customs forms chosen by all members of a group 
 part2 :: [String] -> Int
 part2 input =
   let answers = foldl processInputPart2 ([], ['a' .. 'z']) input
