@@ -4,7 +4,7 @@ main :: IO ()
 main = do
   -- Read file
   seats <- readInput "./inputFiles/day11.txt"
-  --print $ part1 seats
+  print $ part1 seats
   print $ part2 seats
 
 
