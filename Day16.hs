@@ -17,10 +17,13 @@ import Text.Parsec
   )
 import Text.Parsec.String (Parser)
 
+
+data Operation = Either Int (Operation, Char, Operation)
+
 main :: IO ()
 main = do
   -- Read file
-  input <- readInput "./inputFiles/day16a.txt"
+  input <- readInput "./inputFiles/day16.txt"
   let fields = map (rights . parse parseInput "") (takeWhile (not . null) input)
   let myTicket = mapCommaSeparatedToIntArray (input !! (length fields + 2)) -- skip the header and just get te specific line
   let otherTickets = map mapCommaSeparatedToIntArray (drop (length fields + 5) input)
